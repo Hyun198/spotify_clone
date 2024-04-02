@@ -1,6 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { render } from '@testing-library/react';
 function App() {
 
   const CLIENT_ID = "28e364844a4848e3905c1f15953abfd0"
@@ -11,6 +12,7 @@ function App() {
   const [token, setToken] = useState("")
   const [searchKey, setSearchKey] = useState("")
   const [artists, setArtists] = useState([])
+  const [albums, setAlbums] = useState([])
 
   useEffect(() => {
     const hash = window.location.hash
@@ -43,16 +45,43 @@ function App() {
         limit: 10
       }
     })
-    console.log(data)
     setArtists(data.artists.items)
+
+  }
+
+  const searchAlbums = async (artistId) => {
+    const { data } = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        limit: 10
+      },
+    })
+
+    setAlbums(data.items)
 
   }
 
   const renderArtists = () => {
     return artists.map(artist => (
-      <div key={artist.id}>
+      <div key={artist.id} onClick={() => searchAlbums(artist.id)}>
         {artist.images.length ? <img src={artist.images[0].url} alt={artist.name} /> : <div>No images</div>}
         {artist.name}
+      </div>
+    ))
+  }
+
+  const renderAlbums = () => {
+    return artists.map(albums => (
+      <div key={albums.id}>
+        {albums.albums.items.map(album => (
+          <div key={album.id}>
+            {album.images.length ? <img src={album.images[0].url} alt={album.name} /> : <div>No images</div>}
+            {album.name}
+          </div>
+        ))
+        }
       </div>
     ))
   }
@@ -74,7 +103,7 @@ function App() {
           }
 
           {renderArtists()}
-
+          { }
 
         </header>
       </div>
