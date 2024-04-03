@@ -11,8 +11,8 @@ function App() {
 
   const [token, setToken] = useState("")
   const [searchKey, setSearchKey] = useState("")
+  const [topArtist, setTopArtist] = useState(null)
   const [artists, setArtists] = useState([])
-  const [albums, setAlbums] = useState([])
 
   useEffect(() => {
     const hash = window.location.hash
@@ -33,6 +33,16 @@ function App() {
     window.localStorage.removeItem("token")
   }
 
+  const getTracks = async (artistId) => {
+    const { data } = await axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    console.log(1);
+    console.log(data);
+  }
+
   const searchArtists = async (e) => {
     e.preventDefault()
     const { data } = await axios.get("https://api.spotify.com/v1/search", {
@@ -45,67 +55,59 @@ function App() {
         limit: 10
       }
     })
+    const topArtist = data.artists.items[0];
+    setTopArtist(topArtist)
     setArtists(data.artists.items)
 
-  }
-
-  const searchAlbums = async (artistId) => {
-    const { data } = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: {
-        limit: 10
-      },
-    })
-
-    setAlbums(data.items)
+    if (topArtist) {
+      await getTracks(topArtist.id);
+    }
 
   }
+
 
   const renderArtists = () => {
-    return artists.map(artist => (
-      <div key={artist.id} onClick={() => searchAlbums(artist.id)}>
-        {artist.images.length ? <img src={artist.images[0].url} alt={artist.name} /> : <div>No images</div>}
+    const limitedArtists = artists.slice(0, 8);
+
+    return limitedArtists.map(artist => (
+      <div className="artist" key={artist.id}>
+        {artist.images.length ? <img className="artist_imgs" src={artist.images[0].url} alt={artist.name} /> : <div>No images</div>}
         {artist.name}
       </div>
     ))
   }
 
-  const renderAlbums = () => {
-    return artists.map(albums => (
-      <div key={albums.id}>
-        {albums.albums.items.map(album => (
-          <div key={album.id}>
-            {album.images.length ? <img src={album.images[0].url} alt={album.name} /> : <div>No images</div>}
-            {album.name}
-          </div>
-        ))
-        }
-      </div>
-    ))
-  }
+
 
   return (
     <>
       <div className="App">
-        <header className="App-header">
-          <h1>Spotify React</h1>
-          {!token ? <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
-            : <button onClick={logout}>logout</button>}
+        <h1 className='title'>Spotify Clone</h1>
+        <header className="header_container">
 
           {token ?
             <form onSubmit={searchArtists}>
-              <input type="text" onChange={e => setSearchKey(e.target.value)} />
+              <input className="search_box" type="text" placeholder='노래, 앨범, 아티스트 검색' onChange={e => setSearchKey(e.target.value)} />
               <button type={"submit"}>Search</button>
             </form>
             : <h2>Please login</h2>
           }
+          {!token ? <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
+            : <button className="btn-logout" onClick={logout}>logout</button>}
 
-          {renderArtists()}
-          { }
 
         </header>
+        {topArtist && (
+          <div className='top-artist'>
+            {topArtist.images.length ? <img className="artist_imgs" src={topArtist.images[0].url} alt={topArtist.name} /> : <div>No images</div>}
+            <h2>{topArtist.name}</h2>
+          </div>
+        )}
+
+        <h3>아티스트</h3>
+        <div className="artists">
+          {renderArtists()}
+        </div>
       </div>
 
     </>
