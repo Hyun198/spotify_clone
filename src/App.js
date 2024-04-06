@@ -13,7 +13,7 @@ function App() {
   const [topArtist, setTopArtist] = useState(null)
   const [artists, setArtists] = useState([])
   const [tracks, setTracks] = useState([])
-
+  const [albums, setAlbums] = useState([])
   useEffect(() => {
     const hash = window.location.hash
     let token = window.localStorage.getItem("token")
@@ -28,6 +28,8 @@ function App() {
     setToken(token)
   }, [])
 
+
+
   const logout = () => {
     setToken("")
     window.localStorage.removeItem("token")
@@ -41,6 +43,17 @@ function App() {
     });
     const tracks = data.tracks;
     setTracks(tracks);
+  }
+
+  const getAlbums = async (artistId) => {
+    const { data } = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+
+    });
+    const albums = data.items;
+    setAlbums(albums);
   }
 
   const searchArtists = async (e) => {
@@ -69,9 +82,11 @@ function App() {
 
     if (topArtist) {
       await getTracks(topArtist.id);
+      await getAlbums(topArtist.id);
     }
 
   }
+
 
 
   const renderArtists = () => {
@@ -86,15 +101,17 @@ function App() {
   }
 
 
-
   return (
     <>
       <div className="App">
         <h1 className='title'>Spotify Clone</h1>
         <header className="header_container">
           {token ?
-            <form onSubmit={searchArtists}>
-              <input className="search_box" type="text" placeholder='노래, 앨범, 아티스트 검색' onChange={e => setSearchKey(e.target.value)} />
+            <form className="search_box" onSubmit={searchArtists}>
+              <span class="material-symbols-outlined">
+                search
+              </span>
+              <input className="search-input" type="text" placeholder='노래, 앨범, 아티스트' onChange={e => setSearchKey(e.target.value)} />
               <button type={"submit"}>Search</button>
             </form>
             : <h2>Please login</h2>
@@ -118,21 +135,38 @@ function App() {
             </div>
           )}
           <div className="top-tracks">
+            <h2>Top Tracks</h2>
             {tracks.slice(0, 7).map(track => (
-              <div className="track" key={track.id}>
+              <div className="track" key={track.id} >
                 <img className="track_imgs" src={track.album.images[0].url} alt={track.name} />
                 <div className='track-info'>
                   <h2>{track.name}</h2>
                 </div>
               </div>
+
+
+
             ))}
           </div>
         </main>
+
+
+        <section className='albums'>
+          {albums.map(album => (
+            <div key={album.id}>
+              {album.images.length ? <img className="albums_image" src={album.images[0].url} alt={album.name} /> : <div>No images</div>}
+              <h3>{album.name}</h3>
+            </div>
+          ))}
+        </section>
+
 
         <h3>아티스트</h3>
         <div className="artists">
           {renderArtists()}
         </div>
+
+
       </div>
 
     </>
