@@ -93,25 +93,19 @@ function App() {
   const getTrackLyrics = async (trackId) => {
 
     try {
-      const response = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const track = response.data;
-      if (track.lyrics) {
-        setLyrics(track.lyrics);
-      } else {
-        setLyrics('Lyrics not available for this track.');
-      }
+      const response = await axios.get(`https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=${trackId}&apikey=781f8227f5629e301e16f7a624420189`);
+
+      console.log(response);
     } catch (error) {
       console.error('Error fetching lyrics:', error);
     }
-  }
-  const handleTrackSelect = async (track) => {
-    getTrackLyrics(track.id);
+
   }
 
+  const handleTrackSelect = async (track) => {
+    console.log(track.id);
+    getTrackLyrics(track.id);
+  }
 
   const renderArtists = () => {
     const limitedArtists = artists.slice(0, 8);
