@@ -6,10 +6,32 @@ body {
 
 .header_container {
     display: flex;
-    width: 100%;
+    flex-direction: column;
+    width: 50%;
     margin: auto;
-    line-height: 1rem;
-    justify-content: space-between;
+    align-items: center;
+
+}
+
+
+.header_container h2 {
+    font-size: 2rem;
+    text-transform: capitalize;
+}
+
+.header_container a {
+    font-size: 1.5rem;
+    width: 250px;
+    border: 1px solid #ccc;
+    text-align: center;
+    text-decoration: none;
+    text-transform: capitalize;
+    color: black;
+}
+
+.header_container a:hover {
+    background-color: #ccc;
+    bordeR: 1px solid #fff;
 }
 
 .title {
@@ -19,8 +41,11 @@ body {
 }
 
 .btn-logout {
-    width: 50px;
+    width: 80px;
     height: 50px;
+    border: none;
+    border-radius: 15px;
+    background: #f6f6f6;
 }
 
 .search_box {
@@ -49,10 +74,17 @@ body {
     transition: box-shadow 0.25s;
 }
 
+.search-btn {
+    background-color: #333333;
+    color: white;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+}
+
 .artists {
-    display: flex;
-    width: 100%;
     margin: auto;
+    width: 100%;
     gap: 1.5rem;
 }
 
@@ -65,11 +97,12 @@ body {
 
 
 .artist {
+    width: 100%;
     display: flex;
-    gap: 1rem;
     flex-direction: column;
-    text-align: center;
-    font-size: 1.5rem;
+    align-items: center;
+    border-radius: 15px;
+    background-color: #f6f6f6;
 }
 
 .main_container {
@@ -82,9 +115,12 @@ body {
 .top-artist {
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin: auto;
-    width: 100%;
+    width: 50%;
     height: 100%;
+    border-radius: 15px;
+    background-color: #f6f6f6;
 }
 
 .top-artist-info {
@@ -105,9 +141,17 @@ body {
 }
 
 .top-artist .genre {
-    font-size: 1.8rem;
     text-transform: capitalize;
     font-family: sans-serif;
+    background-color: #333333;
+    width: 130px;
+    height: 50px;
+    border-radius: 10px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
 .topArtist_imgs {

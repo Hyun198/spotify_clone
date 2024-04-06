@@ -14,6 +14,9 @@ function App() {
   const [artists, setArtists] = useState([])
   const [tracks, setTracks] = useState([])
   const [albums, setAlbums] = useState([])
+  const [selectedTrack, setSelectedTrack] = useState(null)
+  const [lyrics, setLyrics] = useState('')
+
   useEffect(() => {
     const hash = window.location.hash
     let token = window.localStorage.getItem("token")
@@ -87,6 +90,27 @@ function App() {
 
   }
 
+  const getTrackLyrics = async (trackId) => {
+
+    try {
+      const response = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const track = response.data;
+      if (track.lyrics) {
+        setLyrics(track.lyrics);
+      } else {
+        setLyrics('Lyrics not available for this track.');
+      }
+    } catch (error) {
+      console.error('Error fetching lyrics:', error);
+    }
+  }
+  const handleTrackSelect = async (track) => {
+    getTrackLyrics(track.id);
+  }
 
 
   const renderArtists = () => {
@@ -108,11 +132,11 @@ function App() {
         <header className="header_container">
           {token ?
             <form className="search_box" onSubmit={searchArtists}>
-              <span class="material-symbols-outlined">
+              <span className="material-symbols-outlined">
                 search
               </span>
               <input className="search-input" type="text" placeholder='노래, 앨범, 아티스트' onChange={e => setSearchKey(e.target.value)} />
-              <button type={"submit"}>Search</button>
+              <button className="search-btn" type={"submit"}>Search</button>
             </form>
             : <h2>Please login</h2>
           }
@@ -134,18 +158,15 @@ function App() {
 
             </div>
           )}
-          <div className="top-tracks">
+          <div className="top-tracks" style={{ display: token ? 'block' : 'none' }}>
             <h2>Top Tracks</h2>
             {tracks.slice(0, 7).map(track => (
               <div className="track" key={track.id} >
-                <img className="track_imgs" src={track.album.images[0].url} alt={track.name} />
+                <img className="track_imgs" src={track.album.images[0].url} alt={track.name} onClick={() => handleTrackSelect(track)} />
                 <div className='track-info'>
                   <h2>{track.name}</h2>
                 </div>
               </div>
-
-
-
             ))}
           </div>
         </main>
@@ -161,8 +182,8 @@ function App() {
         </section>
 
 
-        <h3>아티스트</h3>
-        <div className="artists">
+
+        <div className="artists" style={{ display: token ? 'flex' : 'none' }}>
           {renderArtists()}
         </div>
 
